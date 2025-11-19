@@ -1,0 +1,111 @@
+/* Classes para o novo componente PaginaExcluir.jsx */
+
+.mensagem-confirmacao {
+    color: #333;
+    padding: 15px;
+    border: 2px solid #ffcc00; /* Amarelo para atenção */
+    background-color: #fffacd;
+    margin-bottom: 20px;
+}
+
+.mensagem-aviso {
+    color: orange;
+    font-weight: bold;
+    padding: 10px;
+}
+
+.btn-perigo {
+    background-color: #cc0000;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.btn-cancelar {
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+/* Oculta as setas (spinners) em navegadores WebKit (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Oculta as setas (spinners) em Mozilla Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.ingrediente-item {
+    margin-bottom: 15px; /* Espaço entre os itens */
+    padding-bottom: 10px; /* Espaço antes da borda */
+    border-bottom: 1px solid #eee; /* Linha de separação */
+}
+
+/* Opcional: Garante que a descrição não fique quebrada */
+.ingrediente-item p {
+    margin-bottom: 5px; /* Reduz espaço entre as linhas de dados */
+}
+
+/* Estilos para PaginaExibicao */
+.exibicao-container {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #4CAF50;
+    border-radius: 8px;
+    background-color: #f9fff9;
+    margin-top: 20px;
+}
+
+.exibicao-titulo {
+    color: #2e7d32;
+}
+
+.exibicao-detalhes-box {
+    text-align: left;
+    margin: 20px auto;
+    max-width: 500px;
+    padding: 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.exibicao-botoes {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn-acao {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn-azul {
+    background-color: #007bff;
+}
+
+.btn-azul:hover {
+    background-color: #0056b3;
+}
+
+.btn-cinza {
+    background-color: #6c757d;
+}
+
+.btn-cinza:hover {
+    background-color: #545b62;
+}

@@ -1,0 +1,32 @@
+### 1. CADASTRAR um novo ingrediente (POST)
+POST http://localhost:8080/api/ingredientes
+Content-Type: application/json
+
+{
+  "nome": "Chocolate em Pó 50%",
+  "descricao": "Pacote da marca Dois Frades",
+  "unidadeMedida": "Kg",
+  "quantidade": 1
+}
+
+### 2. CADASTRAR um ingrediente inválido (TESTE DE VALIDAÇÃO)
+POST http://localhost:8080/api/ingredientes
+Content-Type: application/json
+
+{
+  "nome": "",
+  "unidadeMedida": null
+}
+
+
+### 3. BUSCAR todos os ingredientes (GET)
+GET http://localhost:8080/api/ingredientes
+
+
+### 4. BUSCAR filtrando por nome (GET com Filtro)
+GET http://localhost:8080/api/ingredientes?nome=chocolate
+
+### 5. EXCLUIR o ingrediente (DELETE)
+# Certifique-se de que o '1' no final da URL
+# é o ID do item que você acabou de cadastrar.
+DELETE http://localhost:8080/api/ingredientes/1

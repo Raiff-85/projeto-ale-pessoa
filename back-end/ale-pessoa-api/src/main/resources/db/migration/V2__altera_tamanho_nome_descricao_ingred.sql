@@ -1,0 +1,3 @@
+ALTER TABLE ingrediente
+    ALTER COLUMN nome TYPE VARCHAR(50),
+    ALTER COLUMN descricao TYPE VARCHAR(50);
