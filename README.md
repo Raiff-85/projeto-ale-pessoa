@@ -56,6 +56,11 @@ Neste sistema é possível cadastrar ingredientes, além de listá-los, buscá-l
     ```bash
     npm run dev
     ```
+    ou
+    ```bash
+    npm run dev --host
+    ```
+
 4.  Acesse a aplicação em: **http://localhost:5173/**
 
 ## Pontos de Destaque Técnico
