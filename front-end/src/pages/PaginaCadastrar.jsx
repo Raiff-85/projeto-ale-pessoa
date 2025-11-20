@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function PaginaCadastrar() {
     const navigate = useNavigate();
@@ -8,35 +8,28 @@ function PaginaCadastrar() {
     const [nome, setNome] = useState('');
     const [descricao, setDescricao] = useState('');
     const [medida, setMedida] = useState('');
-    const [quantidade, setQuantidade] = useState(0); 
+    const [quantidade, setQuantidade] = useState('');
 
     const [mensagem, setMensagem] = useState({ texto: '', tipo: '' });
-    const [erros, setErros] = useState([]); 
+    const [erros, setErros] = useState([]);
 
-    // 1. Estados de Controle de Conexão (Inicia BLOQUEADO)
+    // Estados de Controle de Conexão
     const [verificandoConexao, setVerificandoConexao] = useState(true);
     const [erroConexaoInicial, setErroConexaoInicial] = useState(null);
 
-    // 2. Teste de Conexão "Fail Fast" (200ms)
     useEffect(() => {
         const testarConexao = async () => {
-            // Configura o cancelamento automático em 200ms
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 200);
 
             try {
-                // Tenta conectar (HEAD é mais leve)
-                await fetch('http://localhost:8080/api/ingredientes', { 
-                    method: 'HEAD', 
-                    signal: controller.signal 
+                await fetch('http://localhost:8080/api/ingredientes', {
+                    method: 'HEAD',
+                    signal: controller.signal
                 });
-                
-                // Sucesso: Libera o formulário
                 setVerificandoConexao(false);
-                
             } catch (e) {
                 console.error("Servidor offline ou timeout:", e);
-                // Falha: Define erro e libera para mostrar a mensagem vermelha
                 setErroConexaoInicial("Não foi possível conectar ao servidor.");
                 setVerificandoConexao(false);
             } finally {
@@ -48,24 +41,28 @@ function PaginaCadastrar() {
 
     const handleQuantidadeChange = (e) => {
         let valor = e.target.value;
-        if (valor === '') setQuantidade('');
-        else if (Number(valor) < 0) setQuantidade(0);
-        else setQuantidade(valor);
+        if (valor === '') {
+            setQuantidade('');
+            return;
+        }
+        if (Number(valor) < 0) return;
+    
+        setQuantidade(valor);
     };
 
     const handleSubmit = async (evento) => {
-        evento.preventDefault(); 
+        evento.preventDefault();
         
         const novosErros = [];
-        setMensagem({ texto: '', tipo: '' }); 
-        setErros([]); 
+        setMensagem({ texto: '', tipo: '' });
+        setErros([]);
         
         if (!nome || !medida) novosErros.push("O Nome e/ou Medida (Kg ou L) não podem estar vazios.");
         if (Number(quantidade) <= 0) novosErros.push("A Quantidade deve ser um número maior que zero.");
         
         if (novosErros.length > 0) {
-            setErros(novosErros); 
-            return; 
+            setErros(novosErros);
+            return;
         }
         
         const ingrediente = { nome, descricao, medida, quantidade: Number(quantidade) };
@@ -78,11 +75,16 @@ function PaginaCadastrar() {
             });
     
             if (resposta.ok) {
-                const novoIngrediente = await resposta.json(); 
-                navigate(`/exibicao/${novoIngrediente.id}`);
+                const novoIngrediente = await resposta.json();
+                
+                // Passamos o state 'origem' para avisar que viemos do cadastro
+                navigate(`/exibicao/${novoIngrediente.id}`, { 
+                    state: { origem: 'cadastrar' } 
+                });
+                
             } else if (resposta.status === 400) {
-                const errosBackend = await resposta.json(); 
-                setErros(Object.values(errosBackend)); 
+                const errosBackend = await resposta.json();
+                setErros(Object.values(errosBackend));
             } else {
                 setMensagem({ texto: `Falha ao cadastrar. Código: ${resposta.status}.`, tipo: 'erro' });
             }
@@ -92,29 +94,30 @@ function PaginaCadastrar() {
     };
 
     return (
-        <div>
-            <nav className="nav-superior">
-                <button onClick={() => navigate('/')} className="btn-acao btn-cinza">
-                    🏠 Voltar para o Início
-                </button>
-            </nav>
-            
+        <div> 
             <div className="app-card">
+                <Link to="/">
+                    <img 
+                        src="/assets/ale-pessoa.png" 
+                        alt="Confeitaria Alê Pessoa" 
+                        className="logo-interno" 
+                    />
+                </Link>
+                <nav className="nav-superior">
+                    <button onClick={() => navigate('/')} className="btn-acao btn-cinza">
+                        Voltar para o Início
+                    </button>
+                </nav>
                 <h2 className="app-titulo">Cadastrar Novo Ingrediente</h2>
-
-                {/* LÓGICA DE EXIBIÇÃO (Sem piscar) */}
                 
                 {verificandoConexao ? (
-                    /* 1. Enquanto testa (max 200ms): VAZIO (Card em branco) */
                     null
                 ) : erroConexaoInicial ? (
-                    /* 2. Erro Confirmado: MENSAGEM VERMELHA */
                     <div className="mensagem-erro-conexao">
-                        🚨 <strong>Erro Crítico:</strong> <br/>
+                        <strong>Erro Crítico:</strong> <br/>
                         {erroConexaoInicial}
                     </div>
                 ) : (
-                    /* 3. Conexão OK: FORMULÁRIO */
                     <>
                         {mensagem.texto && mensagem.tipo === 'erro' && (
                             <div className="mensagem-erro">{mensagem.texto}</div>

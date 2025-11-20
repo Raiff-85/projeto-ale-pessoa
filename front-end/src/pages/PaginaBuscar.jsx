@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function PaginaBuscar() {
     const navigate = useNavigate();
@@ -45,20 +45,26 @@ function PaginaBuscar() {
 
     return (
         <div>
-            <nav className="nav-superior">
-                <button onClick={() => navigate('/')} className="btn-acao btn-cinza">
-                    🏠 Voltar para o Início
-                </button>
-            </nav>
-
             <div className="app-card">
-                <h2 className="app-titulo">Buscar Ingrediente</h2>
+                <Link to="/">
+                    <img 
+                        src="/assets/ale-pessoa.png" 
+                        alt="Confeitaria Alê Pessoa" 
+                        className="logo-interno" 
+                    />
+                </Link>
+                <nav className="nav-superior">
+                    <button onClick={() => navigate('/')} className="btn-acao btn-cinza">
+                        Voltar para o Início
+                    </button>
+                </nav>
+                <h1 className="app-titulo">Buscar Ingrediente</h1>
                 
                 {verificandoConexao ? (
                     null 
                 ) : erroConexaoInicial ? (
                     <div className="mensagem-erro-conexao">
-                        🚨 <strong>Erro Crítico:</strong> <br/>
+                        <strong>Erro Crítico:</strong> <br/>
                         {erroConexaoInicial}
                         <br/><br/>
                         <small>Verifique se o Java (Spring Boot) está rodando.</small>
@@ -77,7 +83,7 @@ function PaginaBuscar() {
                                 />
                             </div>
                             <button type="submit" className="btn-acao btn-azul btn-full">
-                                🔍 Buscar por Nome
+                                Buscar por Nome
                             </button>
                         </form>
 
@@ -92,7 +98,7 @@ function PaginaBuscar() {
                                 onClick={handleListarTodos} 
                                 className="btn-acao btn-verde btn-full"
                             >
-                                📋 Listar Todos os Ingredientes
+                                Listar Todos os Ingredientes
                             </button>
 
                             {/* Botão 2: Ver Estoque Baixo (Laranja) */}
@@ -100,7 +106,7 @@ function PaginaBuscar() {
                                 onClick={() => navigate('/resultados?quantidade=5')} 
                                 className="btn-acao btn-laranja btn-full" 
                             >
-                                ⚠️ Ver Estoque Baixo (Repor)
+                                Ver Estoque Baixo (Repor)
                             </button>
                         </div>
                     </>

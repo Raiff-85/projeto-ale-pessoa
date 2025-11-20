@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom/client'
 import './index.css' 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
+// 1. IMPORTANTE: Importe o App (ele é a moldura do site)
+import App from './App.jsx'
+
 import PaginaInicial from './pages/PaginaInicial.jsx'
 import PaginaCadastrar from './pages/PaginaCadastrar.jsx'
 import PaginaBuscar from './pages/PaginaBuscar.jsx'
@@ -14,28 +17,46 @@ import PaginaErro from './pages/PaginaErro.jsx'
 
 const router = createBrowserRouter([
     {
+        // Rota "Pai" (Layout Principal)
         path: "/",
-        element: <PaginaInicial />,
-        // ADIÇÃO: Configura o PaginaErro para capturar 404 (rotas não encontradas)
-        // e outros erros que possam ocorrer no carregamento
-        errorElement: <PaginaErro />, 
-    },
-    { path: "/cadastrar", element: <PaginaCadastrar /> },
-    // ATUALIZADO: Rota de exibição
-    { path: "/exibicao/:id", element: <PaginaExibicao /> },
-
-    { path: "/buscar", element: <PaginaBuscar /> },
-    
-    // A NOVA ROTA "ECONÔMICA"
-    { path: "/resultados", element: <PaginaResultados /> },
-    
-    // A rota /detalhe foi EXCLUÍDA
-    
-    { path: "/editar/:id", element: < PaginaEditar /> },
-    { path: "/excluir/:id", element: < PaginaExcluir /> }
+        element: <App />, 
+        errorElement: <PaginaErro />,
+        
+        // Aqui definimos quem aparece DENTRO do <Outlet /> do App
+        children: [
+            {
+                // index: true significa "quando o caminho for apenas /"
+                index: true, 
+                element: <PaginaInicial />
+            },
+            {
+                path: "cadastrar",
+                element: <PaginaCadastrar />
+            },
+            {
+                path: "exibicao/:id",
+                element: <PaginaExibicao />
+            },
+            {
+                path: "buscar",
+                element: <PaginaBuscar />
+            },
+            {
+                path: "resultados",
+                element: <PaginaResultados />
+            },
+            {
+                path: "editar/:id",
+                element: <PaginaEditar />
+            },
+            {
+                path: "excluir/:id",
+                element: <PaginaExcluir />
+            }
+        ]
+    }
 ]);
 
-// Renderizar o mapa
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>

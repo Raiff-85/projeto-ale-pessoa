@@ -1,168 +1,139 @@
 /* =========================================
-   1. ESTILOS GERAIS (Container Principal)
-   Usa a classe 'app-card' em TODAS as páginas
+   1. RESET E ESTRUTURA (COM FUNDO DECORADO)
    ========================================= */
 
-   .app-card {
-    max-width: 800px; /* Largura padrão para as telas */
-    margin: 30px auto; /* Centraliza na tela */
-    padding: 30px;
-    border: 1px solid #4CAF50; /* Borda Verde */
-    border-radius: 8px;
-    background-color: #f9fff9; /* Fundo Verde Claro */
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave */
-    text-align: center; /* Centraliza títulos e botões */
+   body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Fundo Creme Rosado (Base da Confeitaria) */
+    background-color: #FFF0E5; 
+    overflow-y: auto; 
+    color: #3E2723; /* Marrom Café */
+    position: relative; 
+    min-height: 100vh;
 }
 
-.app-titulo {
-    color: #2e7d32;
-    margin-bottom: 25px;
-    font-size: 1.5rem;
+/* --- O PAPEL DE PAREDE (PATTERN) --- */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* Caminho da imagem com a barra no início */
+    background-image: url('/assets/ale-pessoa.png'); 
+    
+    /* Tamanho das logos no fundo */
+    background-size: 150px; 
+    background-repeat: repeat; 
+    
+    /* --- SUAVIDADE --- */
+    opacity: 0.25; /* 5% para ficar bem suave */
+    
+    /* Remove o quadrado branco das logos do fundo */
+    mix-blend-mode: multiply; 
+    
+    z-index: -1; 
+    pointer-events: none; 
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: center; 
+    padding: 0; 
+    position: relative; 
+    z-index: 1; 
 }
 
 /* =========================================
-   2. ESTILOS DE FORMULÁRIO (Cadastro/Busca)
+   2. CARD (QUADRO) E LOGO INTERNA
+   ========================================= */
+
+.conteudo-pagina {
+    padding: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: column; 
+    box-sizing: border-box;
+}
+
+.app-card {
+    width: 100%;
+    max-width: 500px; 
+    align-self: center; 
+    margin: 0 auto;
+    padding: 35px; 
+    
+    /* Borda Marrom Chocolate */
+    border: 2px solid #5D4037; 
+    border-radius: 20px; 
+    
+    /* Fundo BRANCO PURO (Para a logo JPG sumir o fundo) */
+    background-color: #ffffff; 
+    
+    /* Sombra suave */
+    box-shadow: 0 15px 35px rgba(93, 64, 55, 0.15); 
+    
+    text-align: center;
+}
+
+.logo-interno {
+    display: block;
+    margin: 0 auto 15px auto; 
+    height: 120px; 
+    width: auto;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.logo-interno:hover {
+    transform: scale(1.05);
+}
+
+.app-titulo {
+    color: #5D4037;
+    margin-bottom: 25px; 
+    font-size: 1.6rem; 
+    font-weight: 700;
+    margin-top: 5px; 
+}
+
+/* =========================================
+   3. FORMULÁRIOS (Estilo Gourmet)
    ========================================= */
 
 .form-grupo {
-    margin-bottom: 1px;
-    text-align: center; /* Rótulos e inputs centralizados */
+    margin-bottom: 15px; 
+    text-align: center;
 }
 
 .form-label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #333;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #3E2723;
 }
 
 .form-input {
-    width: 50%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
+    width: 85%; 
+    padding: 12px;
+    border: 1px solid #D7CCC8;
+    border-radius: 10px; 
+    font-size: 15px;
     box-sizing: border-box; 
+    background-color: #fff;
 }
 
 .form-input:focus {
-    border-color: #4CAF50;
+    border-color: #5D4037;
     outline: none;
-}
-
-/* =========================================
-   3. ESTILOS DE BOTÕES
-   ========================================= */
-
-.btn-acao {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-    transition: background-color 0.3s;
-    margin: 5px; /* Espaço entre botões */
-}
-
-.btn-azul { background-color: #007bff; }
-.btn-azul:hover { background-color: #0056b3; }
-
-.btn-verde { background-color: #28a745; }
-.btn-verde:hover { background-color: #218838; }
-
-.btn-cinza { background-color: #6c757d; }
-.btn-cinza:hover { background-color: #545b62; }
-
-.btn-full {
-    width: auto; /* Botão que se adéqua à largura */
-    margin-top: 10px;
-}
-
-/* Botões específicos da página de excluir */
-.btn-perigo {
-    background-color: #cc0000;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.btn-cancelar {
-    background-color: #ccc;
-    color: #333;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-/* =========================================
-   4. ESTILOS DE LISTAGEM (Resultados)
-   ========================================= */
-
-/* Container específico para a lista, para alinhar o texto à esquerda */
-.lista-container {
-    text-align: left; 
-    margin-top: 20px;
-}
-
-.ingrediente-item {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ddd; /* Linha divisória mais suave */
-}
-
-.ingrediente-item p {
-    margin-bottom: 8px;
-    line-height: 1.5; /* Melhora a leitura da linha longa */
-}
-
-/* =========================================
-   5. ESTILOS DE EXIBIÇÃO/DETALHE (Box Branca interna)
-   ========================================= */
-
-.detalhes-box {
-    text-align: left;
-    margin: 20px auto;
-    padding: 15px;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-/* =========================================
-   6. UTILITÁRIOS E MENSAGENS
-   ========================================= */
-
-.mensagem-erro {
-    color: #dc3545;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-}
-
-.mensagem-erro-lista {
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    text-align: left;
-}
-
-.mensagem-confirmacao {
-    color: #333;
-    padding: 15px;
-    border: 2px solid #ffcc00;
-    background-color: #fffacd;
-    margin-bottom: 20px;
-    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(93, 64, 55, 0.25); 
 }
 
 /* Remove setas dos inputs number */
@@ -175,189 +146,190 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
-/* --- Classes Auxiliares para PaginaResultados --- */
+/* =========================================
+   4. BOTÕES (A "Decoração")
+   ========================================= */
 
-/* Container da navegação superior (botões Voltar/Nova Busca) */
-.nav-superior {
-    text-align: center;
-    margin-bottom: 20px;
+.btn-acao {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px; 
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    margin: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
 }
 
-/* Texto de "Carregando..." */
-.texto-carregando {
-    text-align: center;
-    margin-top: 20px;
-    color: #555;
-    font-weight: bold;
+.btn-acao:active {
+    transform: scale(0.98);
+    box-shadow: none;
 }
 
-/* Caixa Amarela (Aviso: Nenhum item encontrado) */
-.mensagem-alerta-amarelo {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    text-align: center;
+/* Cores Temáticas */
+.btn-azul { background-color: #5D4037; } /* Chocolate */
+.btn-azul:hover { background-color: #3E2723; transform: translateY(-2px); }
+
+.btn-verde { background-color: #D81B60; } /* Framboesa */
+.btn-verde:hover { background-color: #AD1457; transform: translateY(-2px); }
+
+.btn-cinza { background-color: #A1887F; color: #fff; } /* Doce de Leite */
+.btn-cinza:hover { background-color: #8D6E63; transform: translateY(-2px); }
+
+.btn-laranja { background-color: #E65100; } /* Caramelo */
+.btn-laranja:hover { background-color: #BF360C; }
+
+.btn-perigo {
+    background-color: #C62828; /* Cereja */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: inline-block;
+    min-width: 120px; 
 }
+.btn-perigo:hover { background-color: #B71C1C; transform: translateY(-2px); }
 
-/* Caixa Vermelha (Erro Crítico: Sem conexão) */
-.mensagem-erro-conexao {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    text-align: center;
+.btn-cancelar {
+    background-color: #A1887F; /* Doce de Leite */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: inline-block;
+    min-width: 120px; 
+    margin-left: 10px; 
 }
+.btn-cancelar:hover { background-color: #8D6E63; transform: translateY(-2px); }
 
-/* Links de Ação (Editar / Excluir) */
-.acoes-container {
-    margin-top: 8px;
-}
-
-.link-editar {
-    color: #007bff;
-    font-weight: bold;
-    text-decoration: none;
-    margin-right: 15px;
-}
-
-.link-editar:hover {
-    text-decoration: underline;
-}
-
-.link-excluir {
-    color: #dc3545; /* Vermelho */
-    font-weight: bold;
-    text-decoration: none;
-}
-
-.link-excluir:hover {
-    text-decoration: underline;
-}
-
-/* --- Separador da Lista (Usado na Busca) --- */
-.separador-lista {
-    margin-top: 30px;
-    border-top: 1px dashed #ccc;
-    padding-top: 20px;
-}
-
-.texto-secundario {
-    margin-bottom: 15px;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-/* --- Estilos Específicos para a Home (PaginaInicial) --- */
-
-.home-subtitulo {
-    color: #555;
-    font-size: 1.2rem;
-    margin-bottom: 30px;
-}
-
-.texto-instrucao {
-    margin-bottom: 25px;
-    color: #666;
-}
-
-.home-menu-botoes {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-}
-
-/* Botões do Home */
-.btn-home {
-    padding: 15px;
-    font-size: 1.1rem;
-    width:fit-content;
-}
-
-/* --- Estilos de Estoque (Cores Semânticas) --- */
-
-/* Estoque Normal (Verde) */
-.estoque-ok {
-    color: #2e7d32;
-    font-weight: bold;
-}
-
-/* Estoque Baixo (Laranja) - Opcional, se quiser diferenciar <= 5 */
-.estoque-baixo {
-    color: #ef6c00;
-    font-weight: bold;
-}
-
-/* Estoque Zerado (Vermelho) */
-.estoque-zerado {
-    color: #d32f2f;
-    font-weight: bold;
-    background-color: #ffebee;
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid #ffcdd2;
-}
-
-/* Item da lista com estoque zerado (Opcional: fundo levemente vermelho) */
-.ingrediente-item.esgotado {
-    background-color: #fff5f5;
-    border-left: 4px solid #d32f2f; /* Uma barra lateral vermelha para destacar */
-}
-
-.btn-laranja {
-    background-color:#ef6c00;
+.btn-full {
+    width: auto;
+    display: inline-block; 
+    margin-top: 15px;
 }
 
 /* =========================================
-   7. ESTILOS PARA PAGINA DE ERRO (PaginaErro.jsx)
+   5. LISTAGEM E UTILITÁRIOS
    ========================================= */
 
-   .pagina-erro {
-    padding: 20px;
-    text-align: center;
-    font-family: Arial, sans-serif;
+.lista-container { text-align: left; margin-top: 20px; }
+
+.ingrediente-item { 
+    margin-bottom: 12px; 
+    padding-bottom: 12px; 
+    border-bottom: 1px solid #D7CCC8; 
+    font-size: 0.95rem; 
+    color: #4E342E; 
 }
 
-.erro-titulo {
-    font-size: 2rem;
-    color: #d32f2f;
-    margin-bottom: 15px;
+.detalhes-box { 
+    text-align: left; 
+    margin: 15px auto; 
+    padding: 20px; 
+    background-color: #FFF8E1; 
+    border: 1px solid #FFE0B2; 
+    border-radius: 12px; 
+    font-size: 1rem; 
+    color: #5D4037; 
 }
 
-.erro-mensagem {
-    font-size: 1.1rem;
-    color: #333;
+.acoes-container {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px; 
+}
+
+/* Links transformados em botões na lista */
+.link-editar {
+    background-color: #D81B60;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.85rem;
+    transition: background-color 0.3s;
+}
+.link-editar:hover { background-color: #AD1457; }
+
+.link-excluir {
+    background-color: #C62828;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.85rem;
+    transition: background-color 0.3s;
+}
+.link-excluir:hover { background-color: #B71C1C; }
+
+/* Mensagens Gerais */
+.mensagem-erro, .mensagem-erro-conexao { background-color: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; padding: 10px; margin-bottom: 15px; border-radius: 8px; }
+.mensagem-alerta-amarelo { background-color: #FFFDE7; color: #F57F17; border: 1px solid #FFF9C4; padding: 10px; margin-bottom: 15px; border-radius: 8px; }
+.mensagem-sucesso { background-color: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; padding: 10px; margin-bottom: 15px; border-radius: 8px; }
+
+.nav-superior {
+    margin-bottom: 15px; 
+    text-align: center; 
+}
+
+.separador-lista { margin-top: 25px; border-top: 2px dashed #D7CCC8; padding-top: 20px; }
+.estoque-zerado { color: #C62828; font-weight: bold; background-color: #FFEBEE; padding: 4px 8px; border-radius: 6px; border: 1px solid #FFCDD2; }
+
+/* =========================================
+   6. CLASSES ESPECÍFICAS (Sem style inline)
+   ========================================= */
+
+/* Título vermelho para sucesso da exclusão */
+.titulo-perigo {
+    color: #C62828 !important;
+}
+
+/* Caixa de aviso amarela (Antes de excluir) */
+.box-aviso-perigo {
+    background-color: #FFF8E1; /* Creme Amarelado */
+    color: #5D4037; /* Texto Chocolate */
+    border: 1px solid #FFE0B2;
+    padding: 15px;
+    border-radius: 8px;
     margin-bottom: 20px;
 }
 
-.erro-detalhe {
-    color: #888;
-    font-size: 0.95rem;
-    margin-bottom: 30px;
+/* Mensagem de feedback após excluir */
+.mensagem-feedback-exclusao {
+    background-color: #FFEBEE; /* Fundo avermelhado suave */
+    color: #C62828; /* Texto Cereja */
+    border: 1px solid #FFCDD2;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
 }
 
-/* Container do botão */
-.erro-voltar-container {
-    margin-top: 25px;
+/* Utilitário para centralizar os botões */
+.acoes-centralizadas {
+    justify-content: center;
 }
 
-/* Botão de voltar ao início */
-.btn-voltar {
-    display: inline-block;
-    background-color: #007bff;
-    color: white;
-    padding: 10px 22px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s;
+/* Para quando o item foi editado (Cor Framboesa) */
+.titulo-destaque {
+    color: #D81B60 !important;
 }
 
-.btn-voltar:hover {
-    background-color: #0056b3;
+/* Container do botão de cadastrar novo */
+.area-botao-extra {
+    margin-top: 20px;
+    display: block;
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function PaginaInicial() {
     const navigate = useNavigate();
@@ -34,7 +34,13 @@ function PaginaInicial() {
 
     return (
         <div className="app-card">
-            <h1 className="app-titulo">Ale Pessoa</h1>
+            <Link to="/">
+                <img 
+                    src="/assets/ale-pessoa.png" 
+                    alt="Confeitaria Alê Pessoa" 
+                    className="logo-interno" 
+                />
+            </Link>
             <h2 className="home-subtitulo">
                 Sistema de Gerenciamento de Ingredientes
             </h2>

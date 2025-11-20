@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 function PaginaEditar() {
     const { id } = useParams();
@@ -9,7 +9,7 @@ function PaginaEditar() {
     const [nome, setNome] = useState('');
     const [descricao, setDescricao] = useState('');
     const [medida, setMedida] = useState('');
-    const [quantidade, setQuantidade] = useState(0);
+    const [quantidade, setQuantidade] = useState(''); // Começa vazio para não mostrar zero
     const [isLoading, setIsLoading] = useState(true);
     const [mensagem, setMensagem] = useState({ texto: '', tipo: '' });
 
@@ -56,9 +56,12 @@ function PaginaEditar() {
 
     const handleQuantidadeChange = (e) => {
         let valor = e.target.value;
-        if (valor === '') setQuantidade('');
-        else if (Number(valor) < 0) setQuantidade(0);
-        else setQuantidade(valor);
+        if (valor === '') {
+            setQuantidade('');
+            return;
+        }
+        if (Number(valor) < 0) return;
+        setQuantidade(valor);
     };
 
     // 2. Lógica de Submissão do Formulário (PUT)
@@ -78,9 +81,8 @@ function PaginaEditar() {
             if (resposta.ok) {
                 setMensagem({ texto: 'Ingrediente editado com sucesso! Redirecionando...', tipo: 'sucesso' });
                 
-                // REDIRECIONAMENTO PARA A PÁGINA DE RESULTADOS
+                // REDIRECIONAMENTO PARA A PÁGINA DE RESULTADOS (EXIBIÇÃO)
                 setTimeout(() => {
-                  // MUDANÇA: Passamos o estado 'modo: edicao' para a página de exibição saber o que mostrar
                   navigate(`/exibicao/${id}`, { state: { modo: 'edicao' } });
               }, 1500); 
             } else {
@@ -92,21 +94,32 @@ function PaginaEditar() {
     };
 
     if (isLoading) {
-        return <div>Carregando...</div>;
+        return <div className="texto-carregando">Carregando...</div>;
     }
 
     return (
         <div>
-            <nav>
-                <button 
-                    onClick={() => navigate('/buscar')} 
-                    className="link-btn-navegacao"
-                >
-                    [Voltar para a Busca]
-                </button>
-            </nav>
-            
             <div className="app-card">
+                
+                {/* --- 1. LOGO INSERIDA AQUI (DENTRO DO CARD) --- */}
+                <Link to="/">
+                    <img 
+                        src="/assets/ale-pessoa.png" 
+                        alt="Confeitaria Alê Pessoa" 
+                        className="logo-interno" 
+                    />
+                </Link>
+
+                {/* --- 2. BOTÃO VOLTAR (Padronizado com o tema novo) --- */}
+                <nav className="nav-superior">
+                    <button 
+                        onClick={() => navigate(-1)} 
+                        className="btn-acao btn-cinza"
+                    >
+                        Voltar
+                    </button>
+                </nav>
+                
                 <h2 className="app-titulo">Editar Ingrediente (ID: {id})</h2>
                 
                 {mensagem.texto && (

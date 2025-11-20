@@ -21,14 +21,6 @@ function PaginaResultados() {
         }
     };
 
-    // 🚨 NOVA FUNÇÃO: Rola a página para o topo suavemente
-    const handleVoltarAoTopo = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth' // Faz a rolagem ser animada (bonita)
-        });
-    };
-
     useEffect(() => {
         const fetchResultados = async () => {
             setCarregando(true);
@@ -75,19 +67,24 @@ function PaginaResultados() {
 
     return (
         <div>
-            <nav className="nav-superior">
-                <button onClick={() => navigate('/buscar')} className="btn-acao btn-cinza">
-                    Voltar para a busca
-                </button>
-            </nav>
-            
             <div className="app-card">
-                
-                <h2 className="app-titulo">
+                <Link to="/">
+                    <img 
+                        src="/assets/ale-pessoa.png" 
+                        alt="Confeitaria Alê Pessoa" 
+                        className="logo-interno" 
+                    />
+                </Link>
+                <nav className="nav-superior">
+                    <button onClick={() => navigate('/buscar')} className="btn-acao btn-cinza">
+                        Voltar para a busca
+                    </button>
+                </nav>
+                <h1 className="app-titulo">
                     {listarTodos ? 'Estoque Completo' : 
-                     quantidade ? '⚠️ Itens com Estoque Baixo' : 
+                     quantidade ? 'Itens com Estoque Baixo' : 
                      'Resultados da Busca'}
-                </h2>
+                </h1>
 
                 {erroConexao && (
                     <div className="mensagem-erro-conexao">
@@ -116,7 +113,7 @@ function PaginaResultados() {
                                         <strong>Qtde:</strong>{' '}
                                         {ingrediente.quantidade === 0 ? (
                                             <span className="aviso-esgotado">
-                                                🚨 ESGOTADO
+                                                ESGOTADO
                                             </span>
                                         ) : (
                                             <span className="quantidade-ok">{ingrediente.quantidade}</span>
@@ -128,11 +125,11 @@ function PaginaResultados() {
                                     
                                     <div className="acoes-container">
                                         <Link to={`/editar/${ingrediente.id}`} className="link-editar">
-                                            ✏️ [Editar]
+                                            Editar
                                         </Link>
                                         
                                         <Link to={`/excluir/${ingrediente.id}`} className="link-excluir">
-                                            ❌ [Excluir]
+                                            Excluir
                                         </Link>
                                     </div>
                                 </li>

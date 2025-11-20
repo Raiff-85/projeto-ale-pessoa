@@ -1,16 +1,28 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 
 function PaginaExibicao() {
     const { id } = useParams(); 
     const navigate = useNavigate();
-    const location = useLocation(); // Para ler o estado (de onde viemos)
+    const location = useLocation();
     
     const [ingrediente, setIngrediente] = useState(null);
     const [carregando, setCarregando] = useState(true);
 
-    // Verifica se estamos no modo 'edicao' (vinda do editar) ou 'cadastro' (padrão)
     const modoEdicao = location.state?.modo === 'edicao';
+    const origem = location.state?.origem;
+
+    const handleVoltar = () => {
+        if (origem === 'cadastrar') {
+            navigate('/cadastrar');
+        } else {
+            navigate('/buscar');
+        }
+    };
+
+    const textoBotaoVoltar = origem === 'cadastrar' 
+        ? 'Voltar para Cadastro' 
+        : 'Voltar para a busca';
 
     useEffect(() => {
         const fetchIngrediente = async () => {
@@ -31,7 +43,6 @@ function PaginaExibicao() {
                 }
             } catch (error) {
                 console.error("Erro ao buscar:", error);
-                // Se der erro, volta para o início
                 navigate('/');
             } finally {
                 setCarregando(false);
@@ -41,26 +52,37 @@ function PaginaExibicao() {
         fetchIngrediente();
     }, [id, navigate]);
 
-    if (carregando) return <p style={{textAlign:'center', marginTop:'20px'}}>Carregando detalhes...</p>;
+    if (carregando) return <p className="texto-carregando">Carregando detalhes...</p>;
     if (!ingrediente) return null;
 
     return (
         <div>
-            <nav className="nav-superior">
-                <button onClick={() => navigate('/buscar')} className="btn-acao btn-cinza">
-                    Voltar para a busca
-                </button>
-            </nav>
-
             <div className="app-card">
-                {/* TÍTULO DINÂMICO */}
+                
+                {/* Logo Interna */}
+                <Link to="/">
+                    <img 
+                        src="/assets/ale-pessoa.png" 
+                        alt="Confeitaria Alê Pessoa" 
+                        className="logo-interno" 
+                    />
+                </Link>
+
+                {/* Botão Voltar */}
+                <nav className="nav-superior">
+                    <button onClick={handleVoltar} className="btn-acao btn-cinza">
+                        {textoBotaoVoltar}
+                    </button>
+                </nav>
+
                 {modoEdicao ? (
-                    <h2 className="app-titulo" style={{ color: '#007bff' }}>
-                        ✏️ Item Atualizado
+                    // AQUI: Usamos a nova classe 'titulo-destaque'
+                    <h2 className="app-titulo titulo-destaque">
+                        Item Atualizado
                     </h2>
                 ) : (
                     <h2 className="app-titulo">
-                        ✅ Cadastro Realizado!
+                        {origem === 'cadastrar' ? 'Cadastro Realizado com Sucesso!' : 'Detalhes do Ingrediente'}
                     </h2>
                 )}
 
@@ -71,22 +93,19 @@ function PaginaExibicao() {
                     <p><strong>Quantidade:</strong> {ingrediente.quantidade}</p>
                 </div>
 
-                <div className="exibicao-botoes">
-                    
-                    {/* LÓGICA DO BOTÃO: Só mostra "Cadastrar Novo" se NÃO for edição */}
-                    {!modoEdicao && (
+                {/* Botão Extra (SEM STYLE INLINE) */}
+                {!modoEdicao && (
+                    // AQUI: Usamos a nova classe 'area-botao-extra'
+                    <div className="area-botao-extra">
                         <button 
                             onClick={() => navigate('/cadastrar')} 
                             className="btn-acao btn-verde"
                         >
-                            ➕ Cadastrar Novo
+                            Cadastrar Novo Item
                         </button>
-                    )}
+                    </div>
+                )}
 
-                    <button onClick={() => navigate('/buscar')} className="btn-acao btn-cinza">
-                        Voltar para a busca
-                    </button>
-                </div>
             </div>
         </div>
     );

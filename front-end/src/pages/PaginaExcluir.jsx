@@ -1,120 +1,115 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 function PaginaExcluir() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // Dados do ingrediente a ser excluído
     const [ingrediente, setIngrediente] = useState(null);
+    const [excluido, setExcluido] = useState(false); 
 
-    // Estados de Conexão (Fail Fast)
-    const [verificandoConexao, setVerificandoConexao] = useState(true);
-    const [erroConexaoInicial, setErroConexaoInicial] = useState(null);
-
-    // Ao abrir, tenta buscar o ingrediente para confirmar qual é
     useEffect(() => {
-        const buscarIngrediente = async () => {
-            const controller = new AbortController();
-            // Timeout agressivo de 200ms
-            const timeoutId = setTimeout(() => controller.abort(), 200);
-
+        const fetchIngrediente = async () => {
             try {
-                const resposta = await fetch(`http://localhost:8080/api/ingredientes/${id}`, {
-                    signal: controller.signal
-                });
-
+                const resposta = await fetch(`http://localhost:8080/api/ingredientes/${id}`);
                 if (resposta.ok) {
                     const dados = await resposta.json();
                     setIngrediente(dados);
-                    setVerificandoConexao(false);
                 } else {
-                    alert("Ingrediente não encontrado ou já excluído.");
                     navigate('/');
                 }
-            } catch (e) {
-                console.error("Erro ao buscar:", e);
-                setErroConexaoInicial("Não foi possível carregar os dados para exclusão. Servidor Offline.");
-                setVerificandoConexao(false);
-            } finally {
-                clearTimeout(timeoutId);
+            } catch (error) {
+                console.error("Erro:", error);
+                navigate('/');
             }
         };
-        buscarIngrediente();
+        fetchIngrediente();
     }, [id, navigate]);
 
-    const handleConfirmarExclusao = async () => {
+    const handleExcluir = async () => {
         try {
             const resposta = await fetch(`http://localhost:8080/api/ingredientes/${id}`, {
                 method: 'DELETE'
             });
 
             if (resposta.ok) {
-                alert("Ingrediente excluído com sucesso!");
-                navigate('/');
+                setExcluido(true);
             } else {
-                alert("Erro ao excluir. Tente novamente.");
+                alert("Erro ao excluir.");
             }
         } catch (error) {
-            alert("Erro de conexão ao tentar excluir.");
+            alert("Erro de conexão.");
         }
     };
 
+    if (!ingrediente) return <p className="texto-carregando">Carregando...</p>;
+
     return (
-        <div>
-            <nav className="nav-superior">
-                <button onClick={() => navigate('/')} className="btn-acao btn-cinza">
-                    🏠 Voltar para o Início
-                </button>
-            </nav>
-
+        <div className="app-container">
+            
             <div className="app-card">
-                <h2 className="app-titulo">Excluir Ingrediente</h2>
-
-                {/* LÓGICA DE EXIBIÇÃO BLINDADA */}
-                {verificandoConexao ? (
-                    null
-                ) : erroConexaoInicial ? (
-                    <div className="mensagem-erro-conexao">
-                        🚨 <strong>Erro Crítico:</strong> <br/>
-                        {erroConexaoInicial}
-                        <br/><br/>
-                        <small>Verifique se o Back-end está rodando.</small>
+                
+                <Link to="/">
+                    <img 
+                        src="/assets/ale-pessoa.png" 
+                        alt="Confeitaria Alê Pessoa" 
+                        className="logo-interno" 
+                    />
+                </Link>
+                
+                {excluido ? (
+                    // --- TELA DE SUCESSO (Limpa e Sem CSS Inline) ---
+                    <div className="conteudo-sucesso">
+                        {/* Classe 'titulo-perigo' substitui o style color */}
+                        <h2 className="app-titulo titulo-perigo">
+                            Item Excluído!
+                        </h2>
+                        
+                        {/* Classe 'mensagem-feedback-exclusao' substitui o style background/color/border */}
+                        <p className="mensagem-feedback-exclusao">
+                            O ingrediente <strong>{ingrediente.nome}</strong> foi removido do sistema.
+                        </p>
+                        
+                        <button onClick={() => navigate('/')} className="btn-acao btn-cinza">
+                            Voltar para o Início
+                        </button>
                     </div>
+
                 ) : (
-                    /* Só mostra a confirmação se carregou o ingrediente com sucesso */
-                    ingrediente && (
-                        <div>
-                            <div className="mensagem-confirmacao">
-                                <p className="mensagem-aviso">
-                                    ⚠️ Tem certeza que deseja excluir este item?
-                                </p>
-                                <p>Esta ação não poderá ser desfeita.</p>
-                            </div>
+                    // --- TELA DE CONFIRMAÇÃO (Padrão) ---
+                    <>
+                        <nav className="nav-superior">
+                            <button onClick={() => navigate(-1)} className="btn-acao btn-cinza">
+                                Voltar
+                            </button>
+                        </nav>
 
-                            <div className="exibicao-detalhes-box">
-                                <p><strong>Nome:</strong> {ingrediente.nome}</p>
-                                <p><strong>Descrição:</strong> {ingrediente.descricao}</p>
-                                <p><strong>Quantidade:</strong> {ingrediente.quantidade} {ingrediente.medida}</p>
-                            </div>
+                        {/* MUDANÇA AQUI: Adicionado o ID para ficar coerente */}
+                        <h2 className="app-titulo">Excluir Ingrediente (ID: {id})</h2>
 
-                            <div className="exibicao-botoes">
-                                <button 
-                                    onClick={handleConfirmarExclusao} 
-                                    className="btn-perigo"
-                                >
-                                    🗑️ Sim, Excluir Definitivamente
-                                </button>
-
-                                <button 
-                                    onClick={() => navigate('/buscar')} 
-                                    className="btn-cancelar"
-                                >
-                                    Cancelar
-                                </button>
-                            </div>
+                        <div className="detalhes-box">
+                            <p><strong>Nome:</strong> {ingrediente.nome}</p>
+                            <p><strong>Descrição:</strong> {ingrediente.descricao}</p>
+                            <p><strong>Quantidade:</strong> {ingrediente.quantidade} {ingrediente.medida}</p>
                         </div>
-                    )
+
+                        {/* Classe 'box-aviso-perigo' substitui o style inline */}
+                        <div className="box-aviso-perigo">
+                            <p>Tem certeza que deseja excluir este item?</p>
+                            <p><strong>Esta ação não poderá ser desfeita.</strong></p>
+                        </div>
+
+                        {/* Classe 'acoes-centralizadas' substitui justifyContent */}
+                        <div className="acoes-container acoes-centralizadas">
+                            <button onClick={handleExcluir} className="btn-acao btn-perigo">
+                                Sim, Excluir Definitivamente
+                            </button>
+
+                            <button onClick={() => navigate(-1)} className="btn-acao btn-cancelar">
+                                Cancelar
+                            </button>
+                        </div>
+                    </>
                 )}
             </div>
         </div>
