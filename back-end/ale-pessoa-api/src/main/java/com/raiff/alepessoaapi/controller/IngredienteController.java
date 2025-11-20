@@ -30,8 +30,10 @@ public class IngredienteController {
     }
 
     @GetMapping
-    public List<Ingrediente> buscar(@RequestParam(required = false) String nome) {
-        if (nome == null || nome.trim().isEmpty()) {
+    public List<Ingrediente> buscar(@RequestParam(required = false) String nome, @RequestParam(required = false) Integer quantidade) {
+        if (quantidade != null) {
+            return repository.findByQuantidadeLessThanEqual(quantidade);
+        } else if (nome == null || nome.trim().isEmpty()) {
             return repository.findAll();
         } else {
             return repository.findByNomeContainingIgnoreCase(nome);

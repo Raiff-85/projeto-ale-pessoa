@@ -1,11 +1,8 @@
 package com.raiff.alepessoaapi.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 @Data
 @Entity
@@ -26,6 +23,6 @@ public class Ingrediente {
     private String medida;
 
     @NotNull(message = "A quantidade não pode estar vazia.")
-    @Min(value = 1, message = "A quantidade deve ser maior que zero.")
+    @PositiveOrZero(message = "A quantidade não pode ser negativa")
     private Integer quantidade;
 }

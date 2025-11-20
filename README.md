@@ -7,10 +7,11 @@ Neste sistema é possível cadastrar ingredientes, além de listá-los, buscá-l
 
 **Back-end:**
 * Java 17
-* Spring Boot 3
-* JPA / Hibernate
-* Flyway (Versionamento de Banco de Dados)
+* Spring Boot 3.3.5
+* JPA/Hibernate
+* Flyway (Versionamento de Banco de Dados) 9.10.2
 * Bean Validation
+* Swagger/Springdoc OpenAI (Documentação da API) 2.6.0
 
 **Banco de Dados:**
 * PostgreSQL 16+
@@ -34,7 +35,18 @@ Neste sistema é possível cadastrar ingredientes, além de listá-los, buscá-l
     * **Nota:** O **Flyway** executará automaticamente os scripts de migração (localizados em `db/migration`) para criar as tabelas necessárias.
     * O servidor iniciará na porta: **http://localhost:8080**
 
-### 3. Configuração do Frontend
+### 3. Documentação da API (Swagger)
+
+* A documentação interativa das rotas do backend é fornecida automaticamente pelo Springdoc OpenAPI.
+  Após iniciar o servidor, acesse:
+
+* Swagger UI: http://localhost:8080/swagger-ui/index.html
+
+* OpenAPI JSON: http://localhost:8080/v3/api-docs
+
+* Essa interface permite visualizar, testar e compreender todos os endpoints disponíveis no sistema.
+
+### 4. Configuração do Frontend
 1.  Navegue até a pasta do projeto Front-end.
 2.  Instale as dependências:
     ```bash

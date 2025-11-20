@@ -23,8 +23,13 @@ function PaginaEditar() {
         }
 
         const buscarIngrediente = async () => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 200);
+
             try {
-                const resposta = await fetch(`http://localhost:8080/api/ingredientes/${id}`);
+                const resposta = await fetch(`http://localhost:8080/api/ingredientes/${id}`, {
+                    signal: controller.signal
+                });
                 
                 if (resposta.ok) {
                     const dados = await resposta.json();
@@ -42,11 +47,19 @@ function PaginaEditar() {
                 setMensagem({ texto: 'Erro ao conectar com a API para carregar dados.', tipo: 'erro' });
             } finally {
                 setIsLoading(false);
+                clearTimeout(timeoutId);
             }
         };
 
         buscarIngrediente();
     }, [id, navigate]);
+
+    const handleQuantidadeChange = (e) => {
+        let valor = e.target.value;
+        if (valor === '') setQuantidade('');
+        else if (Number(valor) < 0) setQuantidade(0);
+        else setQuantidade(valor);
+    };
 
     // 2. Lógica de Submissão do Formulário (PUT)
     const handleSubmit = async (evento) => {
@@ -67,7 +80,8 @@ function PaginaEditar() {
                 
                 // REDIRECIONAMENTO PARA A PÁGINA DE RESULTADOS
                 setTimeout(() => {
-                  navigate(`/resultados?id=${id}`, { state: { from: '/editar' } });
+                  // MUDANÇA: Passamos o estado 'modo: edicao' para a página de exibição saber o que mostrar
+                  navigate(`/exibicao/${id}`, { state: { modo: 'edicao' } });
               }, 1500); 
             } else {
                 setMensagem({ texto: 'Falha ao editar o ingrediente.', tipo: 'erro' });
@@ -84,46 +98,49 @@ function PaginaEditar() {
     return (
         <div>
             <nav>
-                {/* BOTÃO LIMPO: Usa a classe link-btn-navegacao */}
                 <button 
-                    onClick={() => navigate('/buscar')} // Volta para a página de busca
+                    onClick={() => navigate('/buscar')} 
                     className="link-btn-navegacao"
                 >
                     [Voltar para a Busca]
                 </button>
             </nav>
-            <hr />
-            <h2>Editar Ingrediente (ID: {id})</h2>
             
-            {/* MENSAGEM LIMPA: Usa classes mensagem-erro/mensagem-sucesso */}
-            {mensagem.texto && (
-                <div 
-                    className={mensagem.tipo === 'erro' ? 'mensagem-erro' : 'mensagem-sucesso'}
-                >
-                    {mensagem.texto}
-                </div>
-            )}
-            
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="nome">Nome:</label>
-                    <input type="text" id="nome" value={nome} onChange={(e) => setNome(e.target.value)} />
-                </div>
-                {/* ... (restante dos campos do formulário) ... */}
-                <div>
-                    <label htmlFor="descricao">Descrição:</label>
-                    <input type="text" id="descricao" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
-                </div>
-                <div>
-                    <label htmlFor="medida">Medida (Kg ou L):</label>
-                    <input type="text" id="medida" value={medida} onChange={(e) => setMedida(e.target.value)} />
-                </div>
-                <div>
-                    <label htmlFor="quantidade">Quantidade:</label>
-                    <input type="number" id="quantidade" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} />
-                </div>
-                <button type="submit">Salvar Alterações</button>
-            </form>
+            <div className="app-card">
+                <h2 className="app-titulo">Editar Ingrediente (ID: {id})</h2>
+                
+                {mensagem.texto && (
+                    <div 
+                        className={mensagem.tipo === 'erro' ? 'mensagem-erro' : 'mensagem-sucesso'}
+                    >
+                        {mensagem.texto}
+                    </div>
+                )}
+                
+                <form onSubmit={handleSubmit}>
+                    <div className="form-grupo">
+                        <label htmlFor="nome" className="form-label">Nome:</label>
+                        <input type="text" id="nome" className="form-input" value={nome} onChange={(e) => setNome(e.target.value)} maxLength="50" />
+                    </div>
+                    
+                    <div className="form-grupo">
+                        <label htmlFor="descricao" className="form-label">Descrição:</label>
+                        <input type="text" id="descricao" className="form-input" value={descricao} onChange={(e) => setDescricao(e.target.value)} maxLength="50" />
+                    </div>
+                    
+                    <div className="form-grupo">
+                        <label htmlFor="medida" className="form-label">Medida (Kg ou L):</label>
+                        <input type="text" id="medida" className="form-input" value={medida} onChange={(e) => setMedida(e.target.value)} maxLength="50" />
+                    </div>
+                    
+                    <div className="form-grupo">
+                        <label htmlFor="quantidade" className="form-label">Quantidade:</label>
+                        <input type="number" id="quantidade" className="form-input" value={quantidade} onChange={handleQuantidadeChange} step="1" />
+                    </div>
+                    
+                    <button type="submit" className="btn-acao btn-verde btn-full">Salvar Alterações</button>
+                </form>
+            </div>
         </div>
     );
 }

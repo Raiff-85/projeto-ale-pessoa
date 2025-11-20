@@ -1,65 +1,75 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function PaginaCadastrar() {
     const navigate = useNavigate();
     
-    // Estados individuais para o formulário
+    // Estados do Formulário
     const [nome, setNome] = useState('');
     const [descricao, setDescricao] = useState('');
     const [medida, setMedida] = useState('');
     const [quantidade, setQuantidade] = useState(0); 
 
-    // Declaração dos estados de mensagem e erros
     const [mensagem, setMensagem] = useState({ texto: '', tipo: '' });
-    const [erros, setErros] = useState([]); // Array para armazenar múltiplos erros
+    const [erros, setErros] = useState([]); 
 
-    // Função para tratar valores negativos/nulos no campo Quantidade
+    // 1. Estados de Controle de Conexão (Inicia BLOQUEADO)
+    const [verificandoConexao, setVerificandoConexao] = useState(true);
+    const [erroConexaoInicial, setErroConexaoInicial] = useState(null);
+
+    // 2. Teste de Conexão "Fail Fast" (200ms)
+    useEffect(() => {
+        const testarConexao = async () => {
+            // Configura o cancelamento automático em 200ms
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 200);
+
+            try {
+                // Tenta conectar (HEAD é mais leve)
+                await fetch('http://localhost:8080/api/ingredientes', { 
+                    method: 'HEAD', 
+                    signal: controller.signal 
+                });
+                
+                // Sucesso: Libera o formulário
+                setVerificandoConexao(false);
+                
+            } catch (e) {
+                console.error("Servidor offline ou timeout:", e);
+                // Falha: Define erro e libera para mostrar a mensagem vermelha
+                setErroConexaoInicial("Não foi possível conectar ao servidor.");
+                setVerificandoConexao(false);
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        };
+        testarConexao();
+    }, []);
+
     const handleQuantidadeChange = (e) => {
         let valor = e.target.value;
-        
-        // Permite que o campo fique vazio (melhor UX para limpar)
-        if (valor === '') {
-            setQuantidade('');
-        } 
-        // Se for um número, mas menor que zero, força para zero
-        else if (Number(valor) < 0) {
-            setQuantidade(0);
-        }
-        // Caso contrário, atualiza o valor normalmente
-        else {
-            setQuantidade(valor);
-        }
+        if (valor === '') setQuantidade('');
+        else if (Number(valor) < 0) setQuantidade(0);
+        else setQuantidade(valor);
     };
-
 
     const handleSubmit = async (evento) => {
         evento.preventDefault(); 
         
-        // --- 1. VALIDAÇÃO DE FRONT-END (Múltiplos Erros) ---
         const novosErros = [];
         setMensagem({ texto: '', tipo: '' }); 
         setErros([]); 
         
-        // Validação de campos vazios (Strings)
-        if (!nome || !medida) {
-            novosErros.push("O Nome e/ou Medida (Kg ou L) não podem estar vazios.");
-        }
-        
-        // Validação numérica (Quantidade > 0)
-        if (Number(quantidade) <= 0) {
-            novosErros.push("A Quantidade deve ser um número maior que zero.");
-        }
+        if (!nome || !medida) novosErros.push("O Nome e/ou Medida (Kg ou L) não podem estar vazios.");
+        if (Number(quantidade) <= 0) novosErros.push("A Quantidade deve ser um número maior que zero.");
         
         if (novosErros.length > 0) {
             setErros(novosErros); 
             return; 
         }
         
-        // --- 2. PREPARAÇÃO DO ENVIO ---
         const ingrediente = { nome, descricao, medida, quantidade: Number(quantidade) };
     
-        // --- 3. TRATAMENTO DE API (try/catch) ---
         try {
             const resposta = await fetch('http://localhost:8080/api/ingredientes', {
                 method: 'POST',
@@ -68,104 +78,81 @@ function PaginaCadastrar() {
             });
     
             if (resposta.ok) {
-                const novoIngrediente = await resposta.json();      
+                const novoIngrediente = await resposta.json(); 
                 navigate(`/exibicao/${novoIngrediente.id}`);
-                
             } else if (resposta.status === 400) {
                 const errosBackend = await resposta.json(); 
-                const listaErros = Object.values(errosBackend); 
-                setErros(listaErros); 
-                
+                setErros(Object.values(errosBackend)); 
             } else {
                 setMensagem({ texto: `Falha ao cadastrar. Código: ${resposta.status}.`, tipo: 'erro' });
             }
         } catch (erro) {
-            console.error("Erro na conexão:", erro);
-            setMensagem({ texto: 'Não foi possível conectar à API. Verifique se o servidor está rodando.', tipo: 'erro' });
+            setMensagem({ texto: 'A conexão caiu ao tentar salvar.', tipo: 'erro' });
         }
     };
 
     return (
         <div>
-            <nav>
-                <button onClick={() => navigate('/')} className="link-btn-navegacao">
-                    [Voltar para o Início]
+            <nav className="nav-superior">
+                <button onClick={() => navigate('/')} className="btn-acao btn-cinza">
+                    🏠 Voltar para o Início
                 </button>
             </nav>
-            <hr />
-            <h2>Cadastrar Novo Ingrediente</h2>
-
-            {/* 1. EXIBIÇÃO DE MENSAGENS DE SUCESSO/FALHA DE CONEXÃO */}
-            {mensagem.texto && (
-                <div 
-                    className={mensagem.tipo === 'erro' ? 'mensagem-erro' : 'mensagem-sucesso'}
-                >
-                    {mensagem.texto}
-                </div>
-            )}
             
-            {/* 2. EXIBIÇÃO DO ARRAY DE ERROS (Front-end e Erros 400 do Back-end) */}
-            {erros.length > 0 && (
-                <div className="mensagem-erro-lista">
-                    <p>**Não foi possível cadastrar! Verifique os campos:**</p>
-                    <ul>
-                        {erros.map((erro, index) => (
-                            <li key={index}>{erro}</li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+            <div className="app-card">
+                <h2 className="app-titulo">Cadastrar Novo Ingrediente</h2>
 
-            {/* noValidate para desativar o balão de erro nativo do navegador */}
-            <form onSubmit={handleSubmit} noValidate>
-                <div>
-                    <label htmlFor="nome">Nome:</label>
-                    <input 
-                        type="text" 
-                        id="nome" 
-                        value={nome} 
-                        onChange={(e) => setNome(e.target.value)} 
-                        maxLength="50" 
-                    />
-                </div>
-                <div>
-                    <label htmlFor="descricao">Descrição:</label>
-                    <input 
-                        type="text" 
-                        id="descricao" 
-                        value={descricao} 
-                        onChange={(e) => setDescricao(e.target.value)} 
-                        maxLength="50" 
-                    />
-                </div>
-                <div>
-                    <label htmlFor="medida">Medida (Kg ou L):</label>
-                    <input 
-                        type="text" 
-                        id="medida" 
-                        value={medida} 
-                        onChange={(e) => setMedida(e.target.value)} 
-                        maxLength="50" 
-                    />
-                </div>
-                <div>
-                    <label htmlFor="quantidade">Quantidade:</label>
-                    <input 
-                        type="number" 
-                        id="quantidade" 
-                        value={quantidade} 
-                        onChange={handleQuantidadeChange} 
-                        // ADICIONADO: Bloqueia a digitação do sinal de menos
-                        onKeyDown={(e) => {
-                            if (e.key === '-') {
-                                e.preventDefault(); 
-                            }
-                        }}
-                        step="1"
-                    />
-                </div>
-                <button type="submit">Cadastrar</button>
-            </form>
+                {/* LÓGICA DE EXIBIÇÃO (Sem piscar) */}
+                
+                {verificandoConexao ? (
+                    /* 1. Enquanto testa (max 200ms): VAZIO (Card em branco) */
+                    null
+                ) : erroConexaoInicial ? (
+                    /* 2. Erro Confirmado: MENSAGEM VERMELHA */
+                    <div className="mensagem-erro-conexao">
+                        🚨 <strong>Erro Crítico:</strong> <br/>
+                        {erroConexaoInicial}
+                    </div>
+                ) : (
+                    /* 3. Conexão OK: FORMULÁRIO */
+                    <>
+                        {mensagem.texto && mensagem.tipo === 'erro' && (
+                            <div className="mensagem-erro">{mensagem.texto}</div>
+                        )}
+                        
+                        {erros.length > 0 && (
+                            <div className="mensagem-erro-lista">
+                                <p><strong>Verifique os erros:</strong></p>
+                                <ul>{erros.map((erro, i) => <li key={i}>{erro}</li>)}</ul>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit} noValidate>
+                            <div className="form-grupo">
+                                <label htmlFor="nome" className="form-label">Nome:</label>
+                                <input type="text" id="nome" className="form-input" value={nome} onChange={(e) => setNome(e.target.value)} maxLength="50" />
+                            </div>
+                            
+                            <div className="form-grupo">
+                                <label htmlFor="descricao" className="form-label">Descrição:</label>
+                                <input type="text" id="descricao" className="form-input" value={descricao} onChange={(e) => setDescricao(e.target.value)} maxLength="50" />
+                            </div>
+                            
+                            <div className="form-grupo">
+                                <label htmlFor="medida" className="form-label">Medida (Kg ou L):</label>
+                                <input type="text" id="medida" className="form-input" value={medida} onChange={(e) => setMedida(e.target.value)} maxLength="50" />
+                            </div>
+                            
+                            <div className="form-grupo">
+                                <label htmlFor="quantidade" className="form-label">Quantidade:</label>
+                                <input type="number" id="quantidade" className="form-input" value={quantidade} onChange={handleQuantidadeChange} onKeyDown={(e) => { if (e.key === '-') e.preventDefault(); }} step="1" />
+                            </div>
+                            
+                            <button type="submit" className="btn-acao btn-azul btn-full">Cadastrar</button>
+                        </form>
+                    </>
+                )}
+            </div>
         </div>
     );
 }

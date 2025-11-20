@@ -1,17 +1,27 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 function PaginaExibicao() {
     const { id } = useParams(); 
     const navigate = useNavigate();
+    const location = useLocation(); // Para ler o estado (de onde viemos)
     
     const [ingrediente, setIngrediente] = useState(null);
     const [carregando, setCarregando] = useState(true);
 
+    // Verifica se estamos no modo 'edicao' (vinda do editar) ou 'cadastro' (padrão)
+    const modoEdicao = location.state?.modo === 'edicao';
+
     useEffect(() => {
         const fetchIngrediente = async () => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 200);
+
             try {
-                const resposta = await fetch(`http://localhost:8080/api/ingredientes/${id}`);
+                const resposta = await fetch(`http://localhost:8080/api/ingredientes/${id}`, {
+                    signal: controller.signal
+                });
+                
                 if (resposta.ok) {
                     const dados = await resposta.json();
                     setIngrediente(dados);
@@ -21,24 +31,40 @@ function PaginaExibicao() {
                 }
             } catch (error) {
                 console.error("Erro ao buscar:", error);
+                // Se der erro, volta para o início
+                navigate('/');
             } finally {
                 setCarregando(false);
+                clearTimeout(timeoutId);
             }
         };
         fetchIngrediente();
     }, [id, navigate]);
 
-    if (carregando) return <p>Carregando detalhes...</p>;
-    if (!ingrediente) return <p>Ingrediente não encontrado.</p>;
+    if (carregando) return <p style={{textAlign:'center', marginTop:'20px'}}>Carregando detalhes...</p>;
+    if (!ingrediente) return null;
 
     return (
         <div>
-            <div className="exibicao-container">
-                <h2 className="exibicao-titulo">✅ Cadastro Realizado com Sucesso!</h2>
-                <p>O ingrediente foi salvo no estoque.</p>
-                
-                <div className="exibicao-detalhes-box">
-                    <h3>Detalhes do Item:</h3>
+            <nav className="nav-superior">
+                <button onClick={() => navigate('/buscar')} className="btn-acao btn-cinza">
+                    Voltar para a busca
+                </button>
+            </nav>
+
+            <div className="app-card">
+                {/* TÍTULO DINÂMICO */}
+                {modoEdicao ? (
+                    <h2 className="app-titulo" style={{ color: '#007bff' }}>
+                        ✏️ Item Atualizado
+                    </h2>
+                ) : (
+                    <h2 className="app-titulo">
+                        ✅ Cadastro Realizado!
+                    </h2>
+                )}
+
+                <div className="detalhes-box">
                     <p><strong>Nome:</strong> {ingrediente.nome}</p>
                     <p><strong>Descrição:</strong> {ingrediente.descricao || 'Sem descrição'}</p>
                     <p><strong>Medida:</strong> {ingrediente.medida}</p>
@@ -46,20 +72,19 @@ function PaginaExibicao() {
                 </div>
 
                 <div className="exibicao-botoes">
-                    {/* Botão para Cadastrar Outro */}
-                    <button 
-                        onClick={() => navigate('/cadastrar')} 
-                        className="btn-acao btn-azul"
-                    >
-                        ➕ Cadastrar Novo
-                    </button>
+                    
+                    {/* LÓGICA DO BOTÃO: Só mostra "Cadastrar Novo" se NÃO for edição */}
+                    {!modoEdicao && (
+                        <button 
+                            onClick={() => navigate('/cadastrar')} 
+                            className="btn-acao btn-verde"
+                        >
+                            ➕ Cadastrar Novo
+                        </button>
+                    )}
 
-                    {/* Botão para Voltar ao Início */}
-                    <button 
-                        onClick={() => navigate('/')} 
-                        className="btn-acao btn-cinza"
-                    >
-                        🏠 Voltar ao Início
+                    <button onClick={() => navigate('/buscar')} className="btn-acao btn-cinza">
+                        Voltar para a busca
                     </button>
                 </div>
             </div>

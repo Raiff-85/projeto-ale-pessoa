@@ -9,4 +9,5 @@ import java.util.List;
 public interface IngredienteRepository extends JpaRepository <Ingrediente, Long> {
 
     List<Ingrediente> findByNomeContainingIgnoreCase(String nome);
+    List<Ingrediente> findByQuantidadeLessThanEqual(Integer quantidade);
 }

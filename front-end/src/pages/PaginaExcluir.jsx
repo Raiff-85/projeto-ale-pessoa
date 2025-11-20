@@ -1,102 +1,122 @@
-import { useState, useEffect } from 'react'; // NOVO: Importamos useState
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 function PaginaExcluir() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // Estado para mensagens (sucesso, erro ou confirmação)
-    const [mensagem, setMensagem] = useState({ 
-        texto: `Tem certeza que deseja excluir o ingrediente ID ${id}?`, 
-        tipo: 'confirmacao' // Novo tipo para indicar que precisa de confirmação
-    });
+    // Dados do ingrediente a ser excluído
+    const [ingrediente, setIngrediente] = useState(null);
 
-    const [processando, setProcessando] = useState(false); // Estado para controlar o loading/exclusão
+    // Estados de Conexão (Fail Fast)
+    const [verificandoConexao, setVerificandoConexao] = useState(true);
+    const [erroConexaoInicial, setErroConexaoInicial] = useState(null);
 
-    // Função que executa a exclusão na API
-    const executarExclusao = async () => {
-        setProcessando(true);
-        setMensagem({ texto: `Excluindo ingrediente ID ${id}...`, tipo: 'info' });
+    // Ao abrir, tenta buscar o ingrediente para confirmar qual é
+    useEffect(() => {
+        const buscarIngrediente = async () => {
+            const controller = new AbortController();
+            // Timeout agressivo de 200ms
+            const timeoutId = setTimeout(() => controller.abort(), 200);
 
+            try {
+                const resposta = await fetch(`http://localhost:8080/api/ingredientes/${id}`, {
+                    signal: controller.signal
+                });
+
+                if (resposta.ok) {
+                    const dados = await resposta.json();
+                    setIngrediente(dados);
+                    setVerificandoConexao(false);
+                } else {
+                    alert("Ingrediente não encontrado ou já excluído.");
+                    navigate('/');
+                }
+            } catch (e) {
+                console.error("Erro ao buscar:", e);
+                setErroConexaoInicial("Não foi possível carregar os dados para exclusão. Servidor Offline.");
+                setVerificandoConexao(false);
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        };
+        buscarIngrediente();
+    }, [id, navigate]);
+
+    const handleConfirmarExclusao = async () => {
         try {
-            const url = `http://localhost:8080/api/ingredientes/${id}`;
-            const resposta = await fetch(url, {
-                method: 'DELETE', 
+            const resposta = await fetch(`http://localhost:8080/api/ingredientes/${id}`, {
+                method: 'DELETE'
             });
 
-            if (resposta.status === 204) {
-                // Sucesso: Redireciona para o início após 2 segundos
-                setMensagem({ texto: `Ingrediente ID ${id} excluído com sucesso! Redirecionando...`, tipo: 'sucesso' });
-                setTimeout(() => {
-                    navigate('/'); 
-                }, 2000);
-            } else if (resposta.status === 404) {
-                setMensagem({ texto: "Erro: Ingrediente não encontrado ou já excluído.", tipo: 'erro' });
-                // Volta para a página anterior após erro
-                setTimeout(() => navigate(-1), 3000);
+            if (resposta.ok) {
+                alert("Ingrediente excluído com sucesso!");
+                navigate('/');
             } else {
-                setMensagem({ texto: `Erro na exclusão. Código: ${resposta.status}`, tipo: 'erro' });
-                // Volta para a página anterior após erro
-                setTimeout(() => navigate(-1), 3000);
+                alert("Erro ao excluir. Tente novamente.");
             }
-        } catch (e) {
-            setMensagem({ texto: `Erro ao conectar com a API: ${e.message}`, tipo: 'erro' });
-            // Volta para a página anterior após erro
-            setTimeout(() => navigate(-1), 3000);
-        } finally {
-            setProcessando(false);
+        } catch (error) {
+            alert("Erro de conexão ao tentar excluir.");
         }
     };
 
-    // Função para tratar o cancelamento
-    const cancelarExclusao = () => {
-        setMensagem({ texto: "Exclusão cancelada. Voltando...", tipo: 'aviso' });
-        setTimeout(() => {
-            navigate(-1); // Volta para a página anterior
-        }, 1500);
-    };
-
-    // Redireciona se não tiver ID
-    useEffect(() => {
-        if (!id) {
-            navigate('/');
-        }
-    }, [id, navigate]);
-    
-    // Conteúdo da Página
     return (
         <div>
-            <h2>Confirmar Exclusão</h2>
-            <hr />
+            <nav className="nav-superior">
+                <button onClick={() => navigate('/')} className="btn-acao btn-cinza">
+                    🏠 Voltar para o Início
+                </button>
+            </nav>
 
-            {/* Exibição da Mensagem (usando classes para estilo limpo) */}
-            <div className={`mensagem-${mensagem.tipo}`}>
-                <p><strong>{mensagem.texto}</strong></p>
+            <div className="app-card">
+                <h2 className="app-titulo">Excluir Ingrediente</h2>
+
+                {/* LÓGICA DE EXIBIÇÃO BLINDADA */}
+                {verificandoConexao ? (
+                    null
+                ) : erroConexaoInicial ? (
+                    <div className="mensagem-erro-conexao">
+                        🚨 <strong>Erro Crítico:</strong> <br/>
+                        {erroConexaoInicial}
+                        <br/><br/>
+                        <small>Verifique se o Back-end está rodando.</small>
+                    </div>
+                ) : (
+                    /* Só mostra a confirmação se carregou o ingrediente com sucesso */
+                    ingrediente && (
+                        <div>
+                            <div className="mensagem-confirmacao">
+                                <p className="mensagem-aviso">
+                                    ⚠️ Tem certeza que deseja excluir este item?
+                                </p>
+                                <p>Esta ação não poderá ser desfeita.</p>
+                            </div>
+
+                            <div className="exibicao-detalhes-box">
+                                <p><strong>Nome:</strong> {ingrediente.nome}</p>
+                                <p><strong>Descrição:</strong> {ingrediente.descricao}</p>
+                                <p><strong>Quantidade:</strong> {ingrediente.quantidade} {ingrediente.medida}</p>
+                            </div>
+
+                            <div className="exibicao-botoes">
+                                <button 
+                                    onClick={handleConfirmarExclusao} 
+                                    className="btn-perigo"
+                                >
+                                    🗑️ Sim, Excluir Definitivamente
+                                </button>
+
+                                <button 
+                                    onClick={() => navigate('/buscar')} 
+                                    className="btn-cancelar"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    )
+                )}
             </div>
-            
-            {/* Botões de Ação, visíveis apenas em 'confirmacao' */}
-            {mensagem.tipo === 'confirmacao' && !processando && (
-                <div style={{ marginTop: '20px' }}>
-                    <button 
-                        onClick={executarExclusao} 
-                        className="btn-perigo" 
-                        style={{ marginRight: '10px' }} // CSS inline temporário, mas o ideal é usar classes
-                    >
-                        Sim, Excluir Definitivamente
-                    </button>
-                    <button 
-                        onClick={cancelarExclusao} 
-                        className="btn-cancelar"
-                    >
-                        Não, Cancelar
-                    </button>
-                </div>
-            )}
-            
-            {/* Mensagem de processamento caso os botões tenham sumido */}
-            {(processando || mensagem.tipo === 'info') && (
-                <p>Processando, aguarde...</p>
-            )}
         </div>
     );
 }

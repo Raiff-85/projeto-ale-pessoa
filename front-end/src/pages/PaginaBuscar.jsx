@@ -1,50 +1,110 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function PaginaBuscar() {
-    const [termoBusca, setTermoBusca] = useState('');
     const navigate = useNavigate();
+    const [termoBusca, setTermoBusca] = useState('');
+
+    // Estados de verificação de conexão
+    const [verificandoConexao, setVerificandoConexao] = useState(true);
+    const [erroConexaoInicial, setErroConexaoInicial] = useState(null);
+
+    // 1. Teste de conexão ao abrir a página
+    useEffect(() => {
+        const testarConexao = async () => {
+            // Configura timeout rápido de 200ms
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 200);
+
+            try {
+                // Tenta pingar a API
+                await fetch('http://localhost:8080/api/ingredientes', { 
+                    signal: controller.signal 
+                });
+                // Se der certo, libera o formulário
+                setVerificandoConexao(false);
+            } catch (e) {
+                console.error("Servidor offline:", e);
+                setErroConexaoInicial("Não foi possível conectar ao servidor. O Back-end parece estar desligado.");
+                setVerificandoConexao(false);
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        };
+        testarConexao();
+    }, []);
 
     const handleBuscar = (e) => {
         e.preventDefault();
-        // Navega enviando o parâmetro 'nome'
         navigate(`/resultados?nome=${termoBusca}`);
     };
 
-    // Nova função para listar tudo
     const handleListarTodos = () => {
-        // Navega enviando um sinal 'todos=true'
         navigate(`/resultados?todos=true`);
     };
 
     return (
         <div>
-            <nav>
-                <button onClick={() => navigate('/')} className="link-btn-navegacao">
-                    [Voltar para o Início]
+            <nav className="nav-superior">
+                <button onClick={() => navigate('/')} className="btn-acao btn-cinza">
+                    🏠 Voltar para o Início
                 </button>
             </nav>
-            <hr />
-            <h2>Buscar Ingrediente</h2>
-            
-            <form onSubmit={handleBuscar}>
-                <label htmlFor="busca">Nome do ingrediente:</label>
-                <input 
-                    type="text" 
-                    id="busca"
-                    placeholder="Ex: Café"
-                    value={termoBusca}
-                    onChange={(e) => setTermoBusca(e.target.value)}
-                />
-                <button type="submit">Buscar por Nome</button>
-            </form>
 
-            {/* --- NOVO BOTÃO AQUI --- */}
-            <div style={{ marginTop: '20px', borderTop: '1px dashed #ccc', paddingTop: '20px' }}>
-                <p>Ou, se preferir, veja o estoque completo:</p>
-                <button onClick={handleListarTodos} style={{ backgroundColor: '#28a745' }}>
-                    📋 Listar Todos os Ingredientes
-                </button>
+            <div className="app-card">
+                <h2 className="app-titulo">Buscar Ingrediente</h2>
+                
+                {verificandoConexao ? (
+                    null 
+                ) : erroConexaoInicial ? (
+                    <div className="mensagem-erro-conexao">
+                        🚨 <strong>Erro Crítico:</strong> <br/>
+                        {erroConexaoInicial}
+                        <br/><br/>
+                        <small>Verifique se o Java (Spring Boot) está rodando.</small>
+                    </div>
+                ) : (
+                    <>
+                        <form onSubmit={handleBuscar}>
+                            <div className="form-grupo">
+                                <input 
+                                    type="text" 
+                                    id="busca"
+                                    className="form-input"
+                                    placeholder="Digite aqui"
+                                    value={termoBusca}
+                                    onChange={(e) => setTermoBusca(e.target.value)}
+                                />
+                            </div>
+                            <button type="submit" className="btn-acao btn-azul btn-full">
+                                🔍 Buscar por Nome
+                            </button>
+                        </form>
+
+                        {/* AQUI ESTÃO OS DOIS BOTÕES EXTRAS */}
+                        <div className="separador-lista">
+                            <p className="texto-secundario">
+                                Ou visualize o estoque completo:
+                            </p>
+                            
+                            {/* Botão 1: Listar Todos (Verde) */}
+                            <button 
+                                onClick={handleListarTodos} 
+                                className="btn-acao btn-verde btn-full"
+                            >
+                                📋 Listar Todos os Ingredientes
+                            </button>
+
+                            {/* Botão 2: Ver Estoque Baixo (Laranja) */}
+                            <button 
+                                onClick={() => navigate('/resultados?quantidade=5')} 
+                                className="btn-acao btn-laranja btn-full" 
+                            >
+                                ⚠️ Ver Estoque Baixo (Repor)
+                            </button>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
