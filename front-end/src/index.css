@@ -23,7 +23,7 @@ body::before {
     width: 100%;
     height: 100%;
     
-    /* Caminho da imagem com a barra no início */
+    /* Caminho da imagem */
     background-image: url('/assets/ale-pessoa.png'); 
     
     /* Tamanho das logos no fundo */
@@ -31,7 +31,7 @@ body::before {
     background-repeat: repeat; 
     
     /* --- SUAVIDADE --- */
-    opacity: 0.25; /* 5% para ficar bem suave */
+    opacity: 0.05; 
     
     /* Remove o quadrado branco das logos do fundo */
     mix-blend-mode: multiply; 
@@ -64,7 +64,8 @@ body::before {
 
 .app-card {
     width: 100%;
-    max-width: 500px; 
+    min-width: 35%;
+    max-width:fit-content; 
     align-self: center; 
     margin: 0 auto;
     padding: 35px; 
@@ -73,7 +74,7 @@ body::before {
     border: 2px solid #5D4037; 
     border-radius: 20px; 
     
-    /* Fundo BRANCO PURO (Para a logo JPG sumir o fundo) */
+    /* Fundo BRANCO PURO */
     background-color: #ffffff; 
     
     /* Sombra suave */
@@ -287,49 +288,66 @@ input[type="number"] {
 }
 
 .separador-lista { margin-top: 25px; border-top: 2px dashed #D7CCC8; padding-top: 20px; }
-.estoque-zerado { color: #C62828; font-weight: bold; background-color: #FFEBEE; padding: 4px 8px; border-radius: 6px; border: 1px solid #FFCDD2; }
 
 /* =========================================
    6. CLASSES ESPECÍFICAS (Sem style inline)
    ========================================= */
 
-/* Título vermelho para sucesso da exclusão */
 .titulo-perigo {
     color: #C62828 !important;
 }
 
-/* Caixa de aviso amarela (Antes de excluir) */
 .box-aviso-perigo {
-    background-color: #FFF8E1; /* Creme Amarelado */
-    color: #5D4037; /* Texto Chocolate */
+    background-color: #FFF8E1; 
+    color: #5D4037; 
     border: 1px solid #FFE0B2;
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
 }
 
-/* Mensagem de feedback após excluir */
 .mensagem-feedback-exclusao {
-    background-color: #FFEBEE; /* Fundo avermelhado suave */
-    color: #C62828; /* Texto Cereja */
+    background-color: #FFEBEE; 
+    color: #C62828; 
     border: 1px solid #FFCDD2;
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 15px;
 }
 
-/* Utilitário para centralizar os botões */
 .acoes-centralizadas {
     justify-content: center;
 }
 
-/* Para quando o item foi editado (Cor Framboesa) */
 .titulo-destaque {
     color: #D81B60 !important;
 }
 
-/* Container do botão de cadastrar novo */
 .area-botao-extra {
     margin-top: 20px;
     display: block;
+}
+
+/* --- ETIQUETA DE ESGOTADO (Correção) --- */
+.aviso-esgotado {
+    background-color: #C62828; /* Vermelho Cereja */
+    color: white;
+    padding: 4px 8px;
+    
+    /* CORREÇÃO AQUI: Borda leve (4px) para parecer etiqueta, 
+       diferente dos botões que são redondos (50px) */
+    border-radius: 4px; 
+    
+    font-weight: bold;
+    font-size: 0.8rem;
+    display: inline-block;
+    
+    /* SEM SOMBRA: Deixa "chapado" para não parecer clicável */
+    box-shadow: none; 
+    
+    /* Cursor padrão para não parecer link */
+    cursor: default; 
+    
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
